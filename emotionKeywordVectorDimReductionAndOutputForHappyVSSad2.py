@@ -23,7 +23,6 @@ from sklearn.cluster import KMeans, MiniBatchKMeans
 from scipy.stats.stats import pearsonr
 #for web queries
 import searchEngine
-import distanceMetrics
 
 
 
