@@ -3,7 +3,7 @@ from sklearn.ensemble import RandomForestClassifier
 import numpy as np
 import csvInOutEmotion
 
-data = csvInOutEmotion.getData('emotionDataTab26f.csv')
+data = csvInOutEmotion.getData('emotionDataTab26f2.csv')
 
 rfc = RandomForestClassifier(n_estimators=100)
 
@@ -26,6 +26,61 @@ def getKey(item):
     return item[0]
 
 sortZipped = sorted(zipped, key=getKey)
+
+
+#4 will refactor later, example diary entries
+d1 = ['great']
+d2 = ['suicidal']
+d3 = ['like_dancing']
+d4 = ['horrible']
+
+
+diaries = list()
+diaries.append(d1)
+diaries.append(d2)
+diaries.append(d3)
+diaries.append(d4)
+
+
+#build vectors for prediction
+
+diaryVectors = list()
+
+diaryVectors.append([])
+diaryVectors.append([])
+diaryVectors.append([])
+diaryVectors.append([])
+
+
+
+for i in labels:
+    for k in range(4):
+        if i in diaries[k]:
+            print(i)
+            diaryVectors[k].append(1)
+        else:
+            diaryVectors[k].append(0)
+
+
+
+
+
+##        
+##    if i in d1:
+##        v1.append(1)
+##    else:
+##        v1.append(0)
+##    
+##    if i in d2:
+##        v2.append(1)
+##    else:
+##        v1.append(0)
+##
+##
+
+
+
+
 
 
 ##km = KMeans(n_clusters=8, init='k-means++', max_iter=300, n_init=1, verbose=True)
