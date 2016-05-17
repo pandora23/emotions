@@ -54,7 +54,7 @@ def getData(distance, numHits, strings):
     words = nltk.corpus.words.words()
     
     
-    for result in results:
+    for result in results[:]:
         
         #print(result)
         if(result != "http://ppaquarium.com/"
@@ -94,12 +94,13 @@ def getData(distance, numHits, strings):
                 #print("DIDNTWORK")
                 pass
 
+    
 
             if accepted == True:
-                
+                ngram = ['feel']    
                 pageTokens = []
                 
-                for word in strings:
+                for word in ngram:
                     #grab all indexes
                     indexList = []
                     i = -1
@@ -141,7 +142,7 @@ def getData(distance, numHits, strings):
                             for token in set1:
                                 #print(type(token))
                                 if isinstance(token, str):
-                                    if token.lower() not in stopwords and token.lower() not in strings and token.lower() in words:
+                                    if token.lower() not in stopwords and token.lower() not in strings and token.lower() in words and token.lower() not in ngram:
                                         #print('tk:')
                                         #print(token.lower())
                                         docTokens.append(token.lower())
@@ -161,7 +162,7 @@ def getData(distance, numHits, strings):
 
 
 d = 5
-n = 50
+n = 2000
 getData(d,n,['happy'])
 hcount = len(emotions)
 print(hcount)
@@ -171,9 +172,9 @@ getData(d,n,['sad'])
 
 #frequencies
 freqVectors = []
-ngWidth=1
+ngWidth=2
 
-bigramVectorizer = CountVectorizer(stop_words = 'english', ngram_range=(1,ngWidth), token_pattern=r'\b\w+\b',min_df=1, max_features = 500);
+bigramVectorizer = CountVectorizer(stop_words = 'english', ngram_range=(1,ngWidth), token_pattern=r'\b\w+\b',min_df=1, max_features = 5000);
 
 transformed = bigramVectorizer.fit_transform(emotions)
 
@@ -186,7 +187,33 @@ tags = bigramVectorizer.get_feature_names()
 
 
 #output to CSV
-with open('emotionDataTab26.csv', 'wb') as csvfile:
+with open('emotionDataTab26f1.csv', 'wb') as csvfile:
+    writer = csv.writer(csvfile, delimiter='\t', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+    tags.append('emotion1')
+    
+    writer.writerow(tags)
+    for vec in transformed[:hcount]:
+        v = vec.toarray()[0].tolist()
+        v.append('HAPPY')
+        writer.writerow(v)
+    for vec in transformed[hcount+1:]:
+        v = vec.toarray()[0].tolist()
+        v.append('SAD')
+        writer.writerow(v)
+
+        
+#i know, hackhackhack
+labels = []
+for entry in tags:
+    entry = entry.replace(' ', '_')
+    labels.append(entry)
+
+tags = labels 
+
+
+
+#output to CSV
+with open('emotionDataTab26f2.csv', 'wb') as csvfile:
     writer = csv.writer(csvfile, delimiter='\t', quotechar='|', quoting=csv.QUOTE_MINIMAL)
     tags.append('emotion1')
     
