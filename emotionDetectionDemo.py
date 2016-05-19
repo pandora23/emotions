@@ -5,12 +5,12 @@ import csvInOutEmotion
 
 data = csvInOutEmotion.getData('emotionDataTab26f2.csv')
 
-rfc = RandomForestClassifier(n_estimators=100)
+rfc = RandomForestClassifier(n_estimators=1)
 
 xval = []
 yval = []
 
-labels = data[0]
+labels = data[0][:-1]
 
 x = data[1:]
 for f in data[1:]:
@@ -31,8 +31,8 @@ sortZipped = sorted(zipped, key=getKey)
 #4 will refactor later, example diary entries
 d1 = ['great']
 d2 = ['suicidal']
-d3 = ['like_dancing']
-d4 = ['horrible']
+d3 = ['positively_kind']
+d4 = ['happiness']
 
 
 diaries = list()
@@ -61,6 +61,9 @@ for i in labels:
         else:
             diaryVectors[k].append(0)
 
+
+for v in diaryVectors:
+    print(rfc.predict(v))
 
 
 

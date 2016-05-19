@@ -51,7 +51,7 @@ def getData(distance, numHits, strings):
     numTitles = len(results)
     keywords = nltk.word_tokenize(strings[0])
     stopwords = nltk.corpus.stopwords.words('english')
-    words = nltk.corpus.words.words()
+    words = nltk.corpus.words.words('en')
     
     
     for result in results[:]:
@@ -117,14 +117,11 @@ def getData(distance, numHits, strings):
                     try:
                         for index in indexList:
                             if index < distanceFromTarget:
-                                #print("Adding")
-                                pageTokens.append(page[:(index+distanceFromTarget)])
+                                pageTokens = pageTokens + page[:(index+distanceFromTarget)]
                             if (index + distanceFromTarget) >= len(page):
-                                #print("Adding")
-                                pageTokens.append(page[(index-distanceFromTarget):])
+                                pageTokens = pageTokens + page[(index-distanceFromTarget):]
                             else:
-                                #print("Adding")
-                                pageTokens.append(page[(index-distanceFromTarget):(index+distanceFromTarget)])
+                                pageTokens = pageTokens + page[(index-distanceFromTarget):(index+distanceFromTarget)]
                     except:
                         pass
 
@@ -132,25 +129,17 @@ def getData(distance, numHits, strings):
                 print(pageTokens)
                 docTokens = []
                 try:
-                    #print("PT")
-                    #print(pageTokens)
                     
-                    #pageTokens = [word.lower() for word in pageTokens if word in words and word.lower() not in keywords
-                     #         and word not in stopwords]
                     if pageTokens != []:
-                        for set1 in pageTokens:
-                            for token in set1:
-                                #print(type(token))
-                                if isinstance(token, str):
-                                    if token.lower() not in stopwords and token.lower() not in strings and token.lower() in words and token.lower() not in ngram:
-                                        #print('tk:')
-                                        #print(token.lower())
-                                        docTokens.append(token.lower())
+                        print('notempt')
+                        docTokens  = [token.lower() for token in pageTokens if token.lower() not in stopwords
+                                      and token.lower() in words and len(token.lower()) > 1 and token.lower() not in ngram]
                 except:
                     pass
 
+                print('dt')
+                print(docTokens)
                 if docTokens != []:
-                #wordSets.append(set(docTokens))
                     emotions.append(' '.join(docTokens))
 
     #print("ALLDATA:")
@@ -162,7 +151,7 @@ def getData(distance, numHits, strings):
 
 
 d = 5
-n = 2000
+n = 10000
 getData(d,n,['happy'])
 hcount = len(emotions)
 print(hcount)
@@ -174,7 +163,7 @@ getData(d,n,['sad'])
 freqVectors = []
 ngWidth=2
 
-bigramVectorizer = CountVectorizer(stop_words = 'english', ngram_range=(1,ngWidth), token_pattern=r'\b\w+\b',min_df=1, max_features = 5000);
+bigramVectorizer = CountVectorizer(stop_words = 'english', ngram_range=(1,ngWidth), token_pattern=r'\b\w+\b',min_df=1, max_features = 50000);
 
 transformed = bigramVectorizer.fit_transform(emotions)
 
@@ -186,20 +175,20 @@ tags = bigramVectorizer.get_feature_names()
 
 
 
-#output to CSV
-with open('emotionDataTab26f1.csv', 'wb') as csvfile:
-    writer = csv.writer(csvfile, delimiter='\t', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-    tags.append('emotion1')
-    
-    writer.writerow(tags)
-    for vec in transformed[:hcount]:
-        v = vec.toarray()[0].tolist()
-        v.append('HAPPY')
-        writer.writerow(v)
-    for vec in transformed[hcount+1:]:
-        v = vec.toarray()[0].tolist()
-        v.append('SAD')
-        writer.writerow(v)
+###output to CSV
+##with open('emotionDataTab26f1.csv', 'wb') as csvfile:
+##    writer = csv.writer(csvfile, delimiter='\t', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+##    tags.append('emotion1')
+##    
+##    writer.writerow(tags)
+##    for vec in transformed[:hcount]:
+##        v = vec.toarray()[0].tolist()
+##        v.append('HAPPY')
+##        writer.writerow(v)
+##    for vec in transformed[hcount+1:]:
+##        v = vec.toarray()[0].tolist()
+##        v.append('SAD')
+##        writer.writerow(v)
 
         
 #i know, hackhackhack
@@ -215,7 +204,7 @@ tags = labels
 #output to CSV
 with open('emotionDataTab26f2.csv', 'wb') as csvfile:
     writer = csv.writer(csvfile, delimiter='\t', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-    tags.append('emotion1')
+    #tags.append('emotion1')
     
     writer.writerow(tags)
     for vec in transformed[:hcount]:
