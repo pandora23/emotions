@@ -163,7 +163,7 @@ getData(d,n,['sad'])
 freqVectors = []
 ngWidth=2
 
-bigramVectorizer = CountVectorizer(stop_words = 'english', ngram_range=(1,ngWidth), token_pattern=r'\b\w+\b',min_df=1, max_features = 50000);
+bigramVectorizer = CountVectorizer(stop_words = 'english', ngram_range=(1,ngWidth), token_pattern=r'\b\w+\b',min_df=1, max_features = 100000);
 
 transformed = bigramVectorizer.fit_transform(emotions)
 
@@ -199,20 +199,34 @@ for entry in tags:
 
 tags = labels 
 
+numDocs = min(hcount, len(emotions)-hcount)
+print(numDocs)
+print(hcount)
+print(len(emotions)-hcount)
+
+
 
 
 #output to CSV
-with open('emotionDataTab26f2.csv', 'wb') as csvfile:
+with open('emotionDataTab26f2rrrr.csv', 'wb') as csvfile:
     writer = csv.writer(csvfile, delimiter='\t', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-    #tags.append('emotion1')
+    tags.append('emotion1')
     
     writer.writerow(tags)
-    for vec in transformed[:hcount]:
+    for vec in transformed[:numDocs]:
+        
         v = vec.toarray()[0].tolist()
+        for i in range(len(v)):
+            if v[i] > 0:
+                v[i] = 1
         v.append('HAPPY')
         writer.writerow(v)
     for vec in transformed[hcount+1:]:
+        
         v = vec.toarray()[0].tolist()
+        for i in range(len(v)):
+            if v[i] > 0:
+                v[i] = 1
         v.append('SAD')
         writer.writerow(v)
 

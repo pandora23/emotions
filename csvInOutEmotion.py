@@ -16,6 +16,6 @@ def getData(filename):
     return data
 
 #test                        
-d1 =getData('emotionDataTab26f.csv')
+#d1 =getData('emotionDataTab26f.csv')
 
 

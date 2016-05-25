@@ -3,9 +3,9 @@ from sklearn.ensemble import RandomForestClassifier
 import numpy as np
 import csvInOutEmotion
 
-data = csvInOutEmotion.getData('emotionDataTab26f2.csv')
+data = csvInOutEmotion.getData('emotionDataTab26f2rr.csv')
 
-rfc = RandomForestClassifier(n_estimators=1)
+rfc = RandomForestClassifier(n_estimators=2, max_depth=1)
 
 xval = []
 yval = []
@@ -29,9 +29,9 @@ sortZipped = sorted(zipped, key=getKey)
 
 
 #4 will refactor later, example diary entries
-d1 = ['great']
-d2 = ['suicidal']
-d3 = ['positively_kind']
+d1 = ['clap']
+d2 = ['low']
+d3 = ['effective']
 d4 = ['happiness']
 
 
