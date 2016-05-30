@@ -10,7 +10,7 @@ def getData(filename):
         reader = csv.reader(f, delimiter=' ', quotechar='|')
         attributeTags = reader.next()[0].split('\t')[:]
         data.append(attributeTags)
-        print(attributeTags)
+        #print(attributeTags)
         for row in reader:
             data.append(row[0].split('\t')[:])
                         

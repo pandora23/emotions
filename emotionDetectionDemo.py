@@ -1,56 +1,110 @@
 from sklearn.ensemble import RandomForestClassifier
 from sklearn import tree
 from sklearn.externals.six import StringIO
+from sklearn.metrics import accuracy_score
 
 import pydot
 
 import numpy as np
 import csvInOutEmotion
 
-data = csvInOutEmotion.getData('emotionDataTab26f2rrrrZBIGRAM.csv')
+bestScore = 0
+bestClassifier = None
+labels = None
 
-#random forest exploration
-rfc = RandomForestClassifier(n_estimators=10, max_depth=2)
+def buildClassifier(ngWid, booleanized, depth, sampleN):
+    data = csvInOutEmotion.getData('emotionDataNG' + str(ngWid) + 'BAG' + str(booleanized) + '.csv')
+    
 
-#decisiontree sklearn
-classifier = tree.DecisionTreeClassifier(max_depth=1000, min_samples_leaf=3)
+    #random forest exploration
+    #rfc = RandomForestClassifier(n_estimators=10, max_depth=2)
 
-xval = []
-yval = []
+    #decisiontree sklearn
+    classifier = tree.DecisionTreeClassifier(max_depth=depth, min_samples_leaf=sampleN)
+
+    xval = []
+    yval = []
+
+    global labels;
+    labels = data[0][:-1]
+
+    x = data[1:]
+    for f in data[1:]:
+        xval.append(f[:-1])
+        yval.append(f[len(f)-1])
+
+    split = int(len(xval)*3/4/2)
+    #print(split)
+    
+    mid = int(len(xval)/2)
+    #print(mid)
+    
+    xtrain = xval[:split] + xval[mid:mid+split]
+    ytrain = yval[:split] + yval[mid:mid+split]
+
+    #print(len(xtrain))
+    #print(len(ytrain))
+
+    
+    xtest = xval[split+1:mid] + xval[mid+split:]
+    ytest = yval[split+1:mid] + yval[mid+split:]
+
+    #print(ytest)
+
+    #rfc.fit(xval, yval)
+
+    #split for cross val
+    classifier.fit(xtrain, ytrain)
+
+            
+    #score on testing data
+    score= classifier.score(xtest, ytest)
+    global bestScore
+    global bestClassifier
+    if score > bestScore:
+        bestClassifier = classifier
+        bestScore = score
+        
+
+    #ypredictions
+    #ypredictionsTrain = classifier.predict(xtrain)
+    #print(ypredictionsTrain)
+    
+    print("Classifier score on test for treeNG" + str(ngWid) + 'BAG' + str(booleanized) + 'depth' + str(depth) + 'leafMin' + str(sampleN)+":" + str(score))
+    #rint(score)
+
+    #feature importances according to random forest
+    ##    zipped = zip(rfc.feature_importances_, labels)
+
+    def getKey(item):
+        return item[0]
+    #sortZipped = sorted(zipped, key=getKey)
+
+    #draw decision tree
+##    with open("tree1.dot","w") as f:
+##        f = tree.export_graphviz(classifier, out_file=f)
+##
+##    dot_data = StringIO()
+##    tree.export_graphviz(classifier, out_file=dot_data, feature_names=labels)
+##    graph  = pydot.graph_from_dot_data(dot_data.getvalue())
+##    graph.write_pdf("treeNG" + str(ngWid) + 'BAG' + str(booleanized) + 'depth' + str(depth) + 'leafMin' + str(sampleN))
+    return classifier
 
 
+#build classifiers with different parameters
+classifiers = []
+ngWidths = [1,2]
+bools = [True, False]
+depths = [100,110,120,130,140]
+leafMins = [2,3]
+for w in ngWidths:
+    for b in bools:
+        for d in depths:
+            for m in leafMins:
+                classifiers.append(buildClassifier(w,b,d,m))
+            
 
-
-labels = data[0][:-1]
-
-x = data[1:]
-for f in data[1:]:
-    xval.append(f[:-1])
-    yval.append(f[len(f)-1])
-
-split = int(len(xval)*2/3)
-xtrain = xval[:split]
-ytrain = yval[:split]
-xtest = xval[split+1:]
-ytest = yval[split+1:]
-
-
-rfc.fit(xval, yval)
-
-#split for cross val
-classifier.fit(xtrain, ytrain)
-
-#score on testing data
-score= classifier.score(xtest, ytest)
-print("Classifier score on test: ")
-print(score)
-
-#feature importances according to random forest
-zipped = zip(rfc.feature_importances_, labels)
-
-def getKey(item):
-    return item[0]
-sortZipped = sorted(zipped, key=getKey)
+#test with fake diary entry co-occuring words
 
 
 
@@ -63,7 +117,11 @@ d5 = ['crying']
 d6 = ['dancing']
 d7 = ['sadness']
 d8 = ['happyness']
-
+d9 = ['like_crying']
+d10 = ['nice']
+d11 = ['sick']
+d12 = ['up']
+d13 = ['down']
 
 
 diaries = list()
@@ -75,60 +133,35 @@ diaries.append(d5)
 diaries.append(d6)
 diaries.append(d7)
 diaries.append(d8)
+diaries.append(d9)
+diaries.append(d10)
+diaries.append(d11)
+diaries.append(d12)
+diaries.append(d13)
 
 #build vectors for prediction
 
 diaryVectors = list()
 
-diaryVectors.append([])
-diaryVectors.append([])
-diaryVectors.append([])
-diaryVectors.append([])
-diaryVectors.append([])
-diaryVectors.append([])
-diaryVectors.append([])
-diaryVectors.append([])
+for i in len(diaries):
+    diaryVectors.append([])
 
-
-
+#turn diaries to word occurence vector
 for i in labels:
-    for k in range(8):
+    for k in range(len(diaries)):
         if i in diaries[k]:
             print(i)
             diaryVectors[k].append(1)
         else:
             diaryVectors[k].append(0)
 
-
+#predict diaries
 for v in diaryVectors:
-    print(classifier.predict(v))
+    print(bestClassifier.predict(v))
 
 
-with open("tree1.dot","w") as f:
-    f = tree.export_graphviz(classifier, out_file=f)
-
-dot_data = StringIO()
-tree.export_graphviz(classifier, out_file=dot_data, feature_names=labels)
-graph  = pydot.graph_from_dot_data(dot_data.getvalue())
-graph.write_pdf("tre1.pdf")
-
-##        
-##    if i in d1:
-##        v1.append(1)
-##    else:
-##        v1.append(0)
-##    
-##    if i in d2:
-##        v2.append(1)
-##    else:
-##        v1.append(0)
-##
-##
-
-
-zipped2 = zip(classifier.feature_importances_, labels)
-
-s2 = sorted(zipped2, key=getKey)
+#zipped2 = zip(classifier.feature_importances_, labels)
+#s2 = sorted(zipped2, key=getKey)
 
 
 

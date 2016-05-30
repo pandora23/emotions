@@ -98,7 +98,7 @@ def getData(distance, numHits, strings):
 
     
 
-            if accepted == True:
+            if accepted == True and 'feel' in page:
                 ngram = ['feel']    
                 pageTokens = []
                 
@@ -140,32 +140,33 @@ def getData(distance, numHits, strings):
                 except:
                     pass
 
-                print('dt')
+                #print('dt')
                 #print(docTokens)
                 if docTokens != []:
+                    #print(docTokens)
                     emotions.append(' '.join(docTokens))
 
     #print("ALLDATA:")
     #print(allData)
-    print("ALL")
+    #print("ALL")
     #print(allData)
     return 1
 
 
 
 d = 5
-n = 50
-getData(d,n,['+happy +feel'])
+n = 25000
+getData(d,n,['+happy +feel -lyrics'])
 hcount = len(emotions)
 print(hcount)
 
-getData(d,n,['+sad +feel'])
+getData(d,n,['+sad +feel -lyrics'])
 
 def genMatrixCSV(ngwidth, booleanize):
     freqVectors = []
     ngWidth=ngwidth
 
-    bigramVectorizer = CountVectorizer(stop_words = 'english', ngram_range=(1,ngWidth), token_pattern=r'\b\w+\b',min_df=1, max_features = 100000);
+    bigramVectorizer = CountVectorizer(stop_words = 'english', ngram_range=(1,ngWidth), token_pattern=r'\b\w+\b',min_df=1, max_features = 200000);
 
     transformed = bigramVectorizer.fit_transform(emotions)
     tags = bigramVectorizer.get_feature_names()
@@ -183,7 +184,7 @@ def genMatrixCSV(ngwidth, booleanize):
     print(len(emotions)-hcount)
 
     #output to CSV
-    with open('emotionDataNG' + str(ngwidth) + 'BAG' + str(booleanize) + '.csv', 'wb') as csvfile:
+    with open('emotionData2NG' + str(ngwidth) + 'BAG' + str(booleanize) + '.csv', 'wb') as csvfile:
         writer = csv.writer(csvfile, delimiter='\t', quotechar='|', quoting=csv.QUOTE_MINIMAL)
         tags.append('emotion1')
         
