@@ -1,7 +1,8 @@
 
-
+import sys
 import csv
 
+csv.field_size_limit(sys.maxsize)
 def getData(filename):
 
     data= []

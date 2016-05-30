@@ -23,7 +23,9 @@ from sklearn.cluster import KMeans, MiniBatchKMeans
 from scipy.stats.stats import pearsonr
 #for web queries
 import searchEngine
+import sys
 
+csv.field_size_limit(sys.maxsize)
 
 
 emotions = list()
@@ -48,7 +50,7 @@ def getData(distance, numHits, strings):
     #just building a frequency table for the web results as a whole
     allData = []
 
-    numTitles = len(results)
+    #numTitles = len(results)
     keywords = nltk.word_tokenize(strings[0])
     stopwords = nltk.corpus.stopwords.words('english')
     words = nltk.corpus.words.words('en')
@@ -126,112 +128,90 @@ def getData(distance, numHits, strings):
                         pass
 
                 print("PageTokens")
-                print(pageTokens)
+                #print(pageTokens)
                 docTokens = []
                 try:
                     
                     if pageTokens != []:
                         print('notempt')
                         docTokens  = [token.lower() for token in pageTokens if token.lower() not in stopwords
-                                      and token.lower() in words and len(token.lower()) > 1 and token.lower() not in ngram]
+                                      and token.lower() in words and len(token.lower()) > 1 and token.lower() not in ngram
+                                      and token.lower() not in ['happy', 'sad']]
                 except:
                     pass
 
                 print('dt')
-                print(docTokens)
+                #print(docTokens)
                 if docTokens != []:
                     emotions.append(' '.join(docTokens))
 
     #print("ALLDATA:")
     #print(allData)
     print("ALL")
-    print(allData)
+    #print(allData)
     return 1
 
 
 
 d = 5
-n = 10000
-getData(d,n,['happy'])
+n = 50
+getData(d,n,['+happy +feel'])
 hcount = len(emotions)
 print(hcount)
 
-getData(d,n,['sad'])
+getData(d,n,['+sad +feel'])
 
+def genMatrixCSV(ngwidth, booleanize):
+    freqVectors = []
+    ngWidth=ngwidth
 
-#frequencies
-freqVectors = []
-ngWidth=2
+    bigramVectorizer = CountVectorizer(stop_words = 'english', ngram_range=(1,ngWidth), token_pattern=r'\b\w+\b',min_df=1, max_features = 100000);
 
-bigramVectorizer = CountVectorizer(stop_words = 'english', ngram_range=(1,ngWidth), token_pattern=r'\b\w+\b',min_df=1, max_features = 100000);
+    transformed = bigramVectorizer.fit_transform(emotions)
+    tags = bigramVectorizer.get_feature_names()
 
-transformed = bigramVectorizer.fit_transform(emotions)
+    labels = []
+    for entry in tags:
+        entry = entry.replace(' ', '_')
+        labels.append(entry)
 
-tags = bigramVectorizer.get_feature_names()
+    tags = labels 
 
-#tfidf next after finishing this
+    numDocs = min(hcount, len(emotions)-hcount)
+    print(numDocs)
+    print(hcount)
+    print(len(emotions)-hcount)
 
-
-
-
-
-###output to CSV
-##with open('emotionDataTab26f1.csv', 'wb') as csvfile:
-##    writer = csv.writer(csvfile, delimiter='\t', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-##    tags.append('emotion1')
-##    
-##    writer.writerow(tags)
-##    for vec in transformed[:hcount]:
-##        v = vec.toarray()[0].tolist()
-##        v.append('HAPPY')
-##        writer.writerow(v)
-##    for vec in transformed[hcount+1:]:
-##        v = vec.toarray()[0].tolist()
-##        v.append('SAD')
-##        writer.writerow(v)
-
+    #output to CSV
+    with open('emotionDataNG' + str(ngwidth) + 'BAG' + str(booleanize) + '.csv', 'wb') as csvfile:
+        writer = csv.writer(csvfile, delimiter='\t', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+        tags.append('emotion1')
         
-#i know, hackhackhack
-labels = []
-for entry in tags:
-    entry = entry.replace(' ', '_')
-    labels.append(entry)
+        writer.writerow(tags)
+        for vec in transformed[:numDocs]:
+            
+            v = vec.toarray()[0].tolist()
+            if booleanize:
+                for i in range(len(v)):
+                    if v[i] > 0:
+                        v[i] = 1
+            v.append('HAPPY')
+            writer.writerow(v)
+        for vec in transformed[hcount+1:]:
+            
+            v = vec.toarray()[0].tolist()
+            if booleanize:
+                for i in range(len(v)):
+                    if v[i] > 0:
+                        v[i] = 1
+            v.append('SAD')
+            writer.writerow(v)
 
-tags = labels 
+#convert to csv files
+genMatrixCSV(1, True)
+genMatrixCSV(2, True)
+genMatrixCSV(1, False)
+genMatrixCSV(2, False)
 
-numDocs = min(hcount, len(emotions)-hcount)
-print(numDocs)
-print(hcount)
-print(len(emotions)-hcount)
-
-
-
-
-#output to CSV
-with open('emotionDataTab26f2rrrr.csv', 'wb') as csvfile:
-    writer = csv.writer(csvfile, delimiter='\t', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-    tags.append('emotion1')
     
-    writer.writerow(tags)
-    for vec in transformed[:numDocs]:
-        
-        v = vec.toarray()[0].tolist()
-        for i in range(len(v)):
-            if v[i] > 0:
-                v[i] = 1
-        v.append('HAPPY')
-        writer.writerow(v)
-    for vec in transformed[hcount+1:]:
-        
-        v = vec.toarray()[0].tolist()
-        for i in range(len(v)):
-            if v[i] > 0:
-                v[i] = 1
-        v.append('SAD')
-        writer.writerow(v)
-
-
-        
-        
-
 
