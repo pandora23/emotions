@@ -2,6 +2,8 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn import tree
 from sklearn.externals.six import StringIO
 from sklearn.metrics import accuracy_score
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 import pydot
 
@@ -81,13 +83,13 @@ def buildClassifier(ngWid, booleanized, depth, sampleN):
     #sortZipped = sorted(zipped, key=getKey)
 
     #draw decision tree
-##    with open("tree1.dot","w") as f:
-##        f = tree.export_graphviz(classifier, out_file=f)
-##
-##    dot_data = StringIO()
-##    tree.export_graphviz(classifier, out_file=dot_data, feature_names=labels)
-##    graph  = pydot.graph_from_dot_data(dot_data.getvalue())
-##    graph.write_pdf("treeNG" + str(ngWid) + 'BAG' + str(booleanized) + 'depth' + str(depth) + 'leafMin' + str(sampleN))
+    with open("tree1.dot","w") as f:
+        f = tree.export_graphviz(classifier, out_file=f)
+
+    dot_data = StringIO()
+    tree.export_graphviz(classifier, out_file=dot_data, feature_names=labels)
+    graph  = pydot.graph_from_dot_data(dot_data.getvalue())
+    graph.write_pdf("2treeNG" + str(ngWid) + 'BAG' + str(booleanized) + 'depth' + str(depth) + 'leafMin' + str(sampleN))
     return classifier
 
 
@@ -95,7 +97,7 @@ def buildClassifier(ngWid, booleanized, depth, sampleN):
 classifiers = []
 ngWidths = [1,2]
 bools = [True, False]
-depths = [100,110,120,130,140]
+depths = [100,110]
 leafMins = [2,3]
 for w in ngWidths:
     for b in bools:
@@ -117,11 +119,11 @@ d5 = ['crying']
 d6 = ['dancing']
 d7 = ['sadness']
 d8 = ['happyness']
-d9 = ['like_crying']
-d10 = ['nice']
-d11 = ['sick']
-d12 = ['up']
-d13 = ['down']
+##d9 = ['like_crying']
+##d10 = ['nice']
+##d11 = ['sick']
+##d12 = ['up']
+##d13 = ['down']
 
 
 diaries = list()
@@ -133,17 +135,17 @@ diaries.append(d5)
 diaries.append(d6)
 diaries.append(d7)
 diaries.append(d8)
-diaries.append(d9)
-diaries.append(d10)
-diaries.append(d11)
-diaries.append(d12)
-diaries.append(d13)
+##diaries.append(d9)
+##diaries.append(d10)
+##diaries.append(d11)
+##diaries.append(d12)
+##diaries.append(d13)
 
 #build vectors for prediction
 
 diaryVectors = list()
 
-for i in len(diaries):
+for i in range(len(diaries)):
     diaryVectors.append([])
 
 #turn diaries to word occurence vector
@@ -156,8 +158,36 @@ for i in labels:
             diaryVectors[k].append(0)
 
 #predict diaries
+
+
+
+x = []
+y = []
+z = []
+
+time = 0
 for v in diaryVectors:
+    prediction = bestClassifier.predict(v)
     print(bestClassifier.predict(v))
+    if prediction == 'HAPPY':
+        print('yes')
+        x.append(1)
+        y.append(0)
+        z.append(time)
+    else:
+        y.append(1)
+        x.append(0)
+        z.append(time)
+        
+    time = time+1
+
+
+fig = plt.figure()
+ax = fig.add_subplot(111,projection='3d')
+ax.plot(x,y,z)
+plt.show()
+        
+
 
 
 #zipped2 = zip(classifier.feature_importances_, labels)

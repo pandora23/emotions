@@ -184,7 +184,7 @@ def genMatrixCSV(ngwidth, booleanize):
     print(len(emotions)-hcount)
 
     #output to CSV
-    with open('emotionData2NG' + str(ngwidth) + 'BAG' + str(booleanize) + '.csv', 'wb') as csvfile:
+    with open('emotionData23NG' + str(ngwidth) + 'BAG' + str(booleanize) + '.csv', 'wb') as csvfile:
         writer = csv.writer(csvfile, delimiter='\t', quotechar='|', quoting=csv.QUOTE_MINIMAL)
         tags.append('emotion1')
         
