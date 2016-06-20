@@ -23,7 +23,7 @@ ls= ['apple','bark','tree']
 printSortedCounts(2,vs,ls)
 
 #usage on dataset from web mining
-data = csvInOutEmotion.getData('emotionData24NG2BAGFalse.csv')
+data = csvInOutEmotion.getData('emotionData25NG2BAGFalse.csv')
 xval = []
 labels1 = data[0][:-1]
 for f in data[1:]:

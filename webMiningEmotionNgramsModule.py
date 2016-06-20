@@ -155,7 +155,7 @@ def getData(distance, numHits, strings):
 
 
 d = 5
-n = 35000
+n = 1000
 getData(d,n,['+happy +feel -lyrics'])
 hcount = len(emotions)
 print(hcount)
@@ -184,7 +184,7 @@ def genMatrixCSV(ngwidth, booleanize):
     print(len(emotions)-hcount)
 
     #output to CSV
-    with open('emotionData25NG' + str(ngwidth) + 'BAG' + str(booleanize) + '.csv', 'wb') as csvfile:
+    with open('emotionData26NG' + str(ngwidth) + 'BAG' + str(booleanize) + '.csv', 'wb') as csvfile:
         writer = csv.writer(csvfile, delimiter='\t', quotechar='|', quoting=csv.QUOTE_MINIMAL)
         tags.append('emotion1')
         

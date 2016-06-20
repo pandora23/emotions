@@ -11,18 +11,20 @@ def addHypernyms(vecs, labels):
     
     results = []
     
-    newLabels = labels
-
+    newLabels = labels[:]
+    labelCount = len(labels)
     numNewCounts = 0
     
     for vec in xVecs:
         newVec = vec
         for i in range(numNewCounts):
             newVec.append(0)
+            
         hypernyms = []
         print("next")
         counter = 0
-        for count in vec:
+        
+        for count in vec[:labelCount]:
             word = labels[counter]
             counter = counter + 1
             if count > 0:
@@ -35,8 +37,8 @@ def addHypernyms(vecs, labels):
                     print("One synset")
                     print(word)
                     hypernym = synsets[0].hypernyms()[0].name[:-5]
-                    if hypernym in labels:
-                        hInd = labels.index(hypernym)
+                    if hypernym in newLabels:
+                        hInd = newLabels.index(hypernym)
                         newVec[hInd] = newVec[hInd] + 1
                     else:
                         newLabels.append(hypernym)
